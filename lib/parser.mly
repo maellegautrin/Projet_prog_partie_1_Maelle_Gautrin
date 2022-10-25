@@ -1,5 +1,5 @@
 %token <int> INT
-%token PLUS MINUS TIMES DIV
+%token PLUSINT PLUSFLOAT MINUSINT MINUSFLOAT TIMESINT TIMESFLOAT MOD INTFUN FLOATFUN DIV
 %token LPAREN RPAREN
 %token EOL
 %left PLUS MINUS        /* lowest precedence */
@@ -14,6 +14,7 @@ main:
 expr:
     INT                     { $1 }
     | LPAREN expr RPAREN      { $2 }
+    | expr  DOT expr          { $1.$3 }
     | expr PLUS expr          { $1 + $3 }
     | expr MINUS expr         { $1 - $3 }
     | expr TIMES expr         { $1 * $3 }

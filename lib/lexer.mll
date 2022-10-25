@@ -6,10 +6,16 @@ rule token = parse
     [' ' '\t']     { token lexbuf }     (* skip blanks *)
     | ['\n' ]        { EOL }
     | ['0'-'9']+ as lxm { INT(int_of_string lxm) }
-    | '+'            { PLUS }
-    | '-'            { MINUS }
-    | '*'            { TIMES }
+    | '+'            { PLUSINT }
+    | "+."           { PLUSFLOT }
+    | '-'            { MINUSINT }
+    | "-."           { MINUSFLOT }
+    | '*'            { TIMESINT }
+    | "*."           { TIMESFLOT }
     | '/'            { DIV }
     | '('            { LPAREN }
     | ')'            { RPAREN }
+    | '.'	     { DOT }
+    | "int"          { INTFUN }
+    | "float"        { FLOATFUN }
     | eof            { raise Eof }
