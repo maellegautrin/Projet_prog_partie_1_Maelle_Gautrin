@@ -16,7 +16,7 @@ type expr =
   | Plusflot of expr * expr
   | Multflot of expr * expr
   | Sousflot of expr * expr
-
+let test= Plusint(Varint(3),Plusint(Varint(2),Varint(3)));;
 (*int*)
 let aff_int () =
   let code =
@@ -112,7 +112,7 @@ let fin =
   inline
     "\n\
     \        print_int:\n\
-    \            movq %rdi, %rsi\n\
+    \            movq %rax, %rsi\n\
     \            movq $S_int,%rdi\n\
     \            xorq %rax, %rax\n\
     \            call printf\n\
@@ -121,14 +121,14 @@ let fin =
   ++ inline
        "\n\
        \        print_double:\n\
-       \            mov $message, %rdi\n\
+       \            mov $S_int, %rdi\n\
        \            mov $1, %rax\n\
        \            call printf \n\
-       \            ret"
+       \            ret\n"
 
 let exp_main expr =
   let i = ref 0 in
-  let l = ref [] in
+  let l = ref nop in
   let rec auxmain expr =
     match expr with
     | Plusint (exp1, exp2) ->
@@ -149,9 +149,9 @@ let exp_main expr =
     | Varint a -> movq (imm a) (reg rax)
     | Plus exp1 -> auxmain exp1
     | Moins exp1 -> auxmain exp1 ++ subq (imm 0) (reg rax)
-    | Varfloat a -> inline ("movsd (val"^string_of_int(!i)^"), %xmm0");
-         l:=  !l ++ inline ("val"^string_of_int !i ^ " : .double" ^ a);
+    | Varfloat a ->  l:=  !l ++ inline ("val"^string_of_int !i ^ " : .double" ^string_of_float a);
         incr i;
+	inline("movsd (val"^string_of_int(!i)^"), %xmm0");
 	
     | Plusflot (exp1, exp2) ->
         auxmain exp1
@@ -193,18 +193,19 @@ let exp_main expr =
   | Plusflot _ -> est_int := false
   | Sousflot _ -> est_int := false
   | Multflot _ -> est_int := false
-  | Varfloat _ ->
-      est_int := false;
+  | Varfloat _ ->est_int:=false
+  |_-> ();
       let code =
         {
           text =
             globl "main" ++ label "main" ++ auxmain expr
-            ++ (if est_int then call print_int else call print_float)
-            ++ ret ++ fin ++ data
+            ++ (if !est_int then call " print_int" else call "print_float")
+            ++ ret ++ fin; data
             = label "S_int" ++ string "%d" ++ !l;
         }
       in
       let c = open_out "print_exp.s" in
       let fmt = formatter_of_out_channel c in
       X86_64.print_program fmt code;
-      close_out c
+      close_out c;;
+exp_main test;;
