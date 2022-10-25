@@ -16,7 +16,7 @@ type expr =
   | Plusflot of expr * expr
   | Multflot of expr * expr
   | Sousflot of expr * expr
-let test= Plusint(Varint(3),Plusint(Varint(2),Varint(3)));;
+let test= Plusflot(Varfloat(2.),Varfloat(3.));;
 (*int*)
 let aff_int () =
   let code =
@@ -121,7 +121,7 @@ let fin =
   ++ inline
        "\n\
        \        print_double:\n\
-       \            mov $S_int, %rdi\n\
+       \            mov $S_float, %rdi\n\
        \            mov $1, %rax\n\
        \            call printf \n\
        \            ret\n"
@@ -154,22 +154,36 @@ let exp_main expr =
 	inline("movsd (val"^string_of_int(!i)^"), %xmm0");
 	
     | Plusflot (exp1, exp2) ->
-        auxmain exp1
-        ++ pushsd (reg xmm0)
-        ++ auxmain exp2
-        ++ popsd (xmm1)
+      let ofs = (-8)*(!i) in
+      let a = movsd (reg xmm0) (ind ~ofs rbp) in
+      let ofs = (-8)*(!i +1) in
+      let b = movsd (ind ~ofs rbp) (reg xmm1) in
+
+      auxmain exp1
+      ++ a
+      ++ auxmain exp2
+      ++ b
         ++ addsd (reg xmm1) (reg xmm0)
     | Sousflot (exp1, exp2) ->
+        let ofs = (-8)*(!i) in
+        let a = movsd (reg xmm0) (ind ~ofs rbp) in
+        let ofs = (-8)*(!i +1) in
+        let b = movsd (ind ~ofs rbp) (reg xmm1) in
+        incr i; incr i;
         auxmain exp1
-        ++ pushsd (reg xmm0)
-        ++ auxmain exp2
-        ++ popsd (xmm1)
+        ++ a
+       ++ auxmain exp2
+        ++ b
         ++ subsd (reg xmm1) (reg xmm0)
     | Multflot (exp1, exp2) ->
+        let ofs = (-8)*(!i) in
+        let a = movsd (reg xmm0) (ind ~ofs rbp) in
+        let ofs = (-8)*(!i +1) in
+        let b = movsd (ind ~ofs rbp) (reg xmm1) in
         auxmain exp1
-        ++ pushsd (reg xmm0)
+        ++ a
         ++ auxmain exp2
-        ++ popsd (xmm1)
+        ++ b
         ++ imulsd (reg xmm1) (reg xmm0)
     | Divint (exp1, exp2) ->
         auxmain exp1
@@ -188,24 +202,26 @@ let exp_main expr =
         ++ movq (reg rax) (reg rdx)
     | _ -> failwith "todo"
   in
-  let est_int = ref true in
-  match expr with
-  | Plusflot _ -> est_int := false
-  | Sousflot _ -> est_int := false
-  | Multflot _ -> est_int := false
-  | Varfloat _ ->est_int:=false
-  |_-> ();
-      let code =
-        {
-          text =
-            globl "main" ++ label "main" ++ auxmain expr
-            ++ (if !est_int then call " print_int" else call "print_float")
-            ++ ret ++ fin; data
-            = label "S_int" ++ string "%d" ++ !l;
-        }
-      in
-      let c = open_out "print_exp.s" in
-      let fmt = formatter_of_out_channel c in
-      X86_64.print_program fmt code;
-      close_out c;;
+
+  let est_int expr = match expr with
+  | Plusflot _ -> false
+  | Sousflot _ -> false
+  | Multflot _ -> false
+  | Varfloat _ -> false
+  |_-> true in 
+  let code =
+    {
+      text =
+         globl "main" ++ label "main" ++ auxmain expr
+         ++ (if (est_int expr) then call " print_int" else call "print_float")
+        ++ ret ++ fin; 
+         data = label "S_int" ++ string "%d" ++ !l ++
+        label "S_float" ++ string "%lf" ++ !l;
+     }
+   in
+   let c = open_out "print_exp2.s" in
+   let fmt = formatter_of_out_channel c in
+  X86_64.print_program fmt code;
+   close_out c;;
+
 exp_main test;;
