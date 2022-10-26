@@ -1,8 +1,11 @@
-type expr =
+
+  type expr =
   | Varint of int
   | Varfloat of float
-  | Plus of expr
-  | Moins of expr
+  | Plusi of expr
+  | Plusf of expr
+  | Moinsi of expr
+  | Moinsf of expr
   | Ent of expr
   | Flot of expr
   | Plusint of expr * expr
