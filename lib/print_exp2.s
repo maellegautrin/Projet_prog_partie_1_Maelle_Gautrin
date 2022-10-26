@@ -1,10 +1,12 @@
 	.text
 	.globl	main
 main:
-movsd (val2), %xmm0	movsd %xmm0, 0(%rbp)
-movsd (val1), %xmm0	movsd -8(%rbp), %xmm1
-	addsd %xmm1, %xmm0
-	call print_float
+	movq $4, %rax
+	pushq %rax
+	movq $2, %rax
+	popq %rcx
+	addq %rcx, %rax
+	call  print_int
 	ret
 
         print_int:

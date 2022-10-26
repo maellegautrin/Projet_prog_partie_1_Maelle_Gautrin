@@ -13,9 +13,10 @@ rule token = parse
     | '*'            { TIMESINT }
     | "*."           { TIMESFLOT }
     | '/'            { DIV }
+    | "%"            { MOD }	
     | '('            { LPAREN }
     | ')'            { RPAREN }
     | '.'	     { DOT }
-    | "int"          { INTFUN }
-    | "float"        { FLOATFUN }
+    | "int"          { E }
+    | "float"        { F }
     | eof            { raise Eof }
