@@ -18,7 +18,7 @@ type expr =
   | Plusflot of expr * expr
   | Multflot of expr * expr
   | Sousflot of expr * expr
-let test= Plusint(Varint(4),Varint(2));;
+let test= Mod(Varint(4),Varint(2));;
 (*int*)
 let aff_int () =
   let code =
@@ -152,7 +152,6 @@ let exp_main expr =
     | Plusi exp1 -> auxmain exp1
     | Moinsi exp1 -> auxmain exp1 ++ subq (imm 0) (reg rax)
     | Varfloat a ->  l:=  !l ++ inline ("val"^string_of_int !i ^ " : .double" ^string_of_float a);
-        incr i;
 	inline("movsd (val"^string_of_int(!i)^"), %xmm0");
 	
     | Plusflot (exp1, exp2) ->
@@ -160,12 +159,12 @@ let exp_main expr =
       let a = movsd (reg xmm0) (ind ~ofs rbp) in
       let ofs = (-8)*(!i +1) in
       let b = movsd (ind ~ofs rbp) (reg xmm1) in
-
+      incr i; incr i;
       auxmain exp1
-      ++ a
+      ++ inline "\n \t" ++ a
       ++ auxmain exp2
-      ++ b
-        ++ addsd (reg xmm1) (reg xmm0)
+      ++ inline"\n \t" ++ b
+      ++ addsd (reg xmm1) (reg xmm0)
     | Sousflot (exp1, exp2) ->
         let ofs = (-8)*(!i) in
         let a = movsd (reg xmm0) (ind ~ofs rbp) in
@@ -182,6 +181,7 @@ let exp_main expr =
         let a = movsd (reg xmm0) (ind ~ofs rbp) in
         let ofs = (-8)*(!i +1) in
         let b = movsd (ind ~ofs rbp) (reg xmm1) in
+        incr i; incr i;
         auxmain exp1
         ++ a
         ++ auxmain exp2
@@ -191,17 +191,19 @@ let exp_main expr =
         auxmain exp1
         ++ pushq (reg rax)
         ++ auxmain exp2
-        ++ popq (rdi) 
-        ++ movq (reg rax) (reg rsi)
+	++ movq (imm 0) (reg rdx)
+	++ movq (reg rax) (reg rsi)
+        ++ popq (rax)
         ++ idivq (reg rsi)
     | Mod (exp1, exp2) ->
         auxmain exp1
         ++ pushq (reg rax)
         ++ auxmain exp2
-        ++ popq (rdi) 
-        ++ movq (reg rax) (reg rsi)
+	++ movq (imm 0) (reg rdx)
+	++ movq (reg rax) (reg rsi)
+        ++ popq (rax) 
         ++ idivq (reg rsi)
-        ++ movq (reg rax) (reg rdx)
+        ++ movq (reg rdx) (reg rax)
     | _ -> failwith "todo"
   in
 
@@ -210,14 +212,16 @@ let exp_main expr =
   | Sousflot _ -> false
   | Multflot _ -> false
   | Varfloat _ -> false
+  | Plusf _ -> false
+  | Moinsf _ -> false 
   |_-> true in 
   let code =
     {
       text =
          globl "main" ++ label "main" ++ auxmain expr
-         ++ (if (est_int expr) then call " print_int" else call "print_float")
+         ++ (if (est_int expr) then call " print_int" else call "print_double")
         ++ ret ++ fin; 
-         data = label "S_int" ++ string "%d" ++ !l ++
+         data = label "S_int" ++ string "%d" ++
         label "S_float" ++ string "%lf" ++ !l;
      }
    in

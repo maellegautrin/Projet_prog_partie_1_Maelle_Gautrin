@@ -4,8 +4,11 @@ main:
 	movq $4, %rax
 	pushq %rax
 	movq $2, %rax
-	popq %rcx
-	addq %rcx, %rax
+	movq $0, %rdx
+	movq %rax, %rsi
+	popq %rax
+	idivq %rsi
+	movq %rdx, %rax
 	call  print_int
 	ret
 
