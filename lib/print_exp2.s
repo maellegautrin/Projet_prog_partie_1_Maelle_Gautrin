@@ -1,15 +1,12 @@
 	.text
 	.globl	main
 main:
-	movq $4, %rax
-	pushq %rax
-	movq $2, %rax
-	movq $0, %rdx
-	movq %rax, %rsi
-	popq %rax
-	idivq %rsi
-	movq %rdx, %rax
-	call  print_int
+movsd (val2), %xmm0
+	movsd %xmm0, 0(%rbp)
+movsd (val2), %xmm0
+	movsd -8(%rbp), %xmm1
+	addsd %xmm1, %xmm0
+	call print_double
 	ret
 
         print_int:

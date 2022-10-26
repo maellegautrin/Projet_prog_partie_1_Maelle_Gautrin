@@ -18,7 +18,7 @@ type expr =
   | Plusflot of expr * expr
   | Multflot of expr * expr
   | Sousflot of expr * expr
-let test= Mod(Varint(4),Varint(2));;
+let test= Plusflot(Varfloat(4.),Varfloat(2.));;
 (*int*)
 let aff_int () =
   let code =
@@ -151,7 +151,7 @@ let exp_main expr =
     | Varint a -> movq (imm a) (reg rax)
     | Plusi exp1 -> auxmain exp1
     | Moinsi exp1 -> auxmain exp1 ++ subq (imm 0) (reg rax)
-    | Varfloat a ->  l:=  !l ++ inline ("val"^string_of_int !i ^ " : .double" ^string_of_float a);
+    | Varfloat a ->  l :=  inline ("val"^string_of_int !i ^ " : .double" ^string_of_float a) ++ !l;
 	inline("movsd (val"^string_of_int(!i)^"), %xmm0");
 	
     | Plusflot (exp1, exp2) ->
@@ -161,9 +161,9 @@ let exp_main expr =
       let b = movsd (ind ~ofs rbp) (reg xmm1) in
       incr i; incr i;
       auxmain exp1
-      ++ inline "\n \t" ++ a
+      ++ inline "\n" ++ a
       ++ auxmain exp2
-      ++ inline"\n \t" ++ b
+      ++ inline"\n" ++ b
       ++ addsd (reg xmm1) (reg xmm0)
     | Sousflot (exp1, exp2) ->
         let ofs = (-8)*(!i) in
@@ -191,7 +191,7 @@ let exp_main expr =
         auxmain exp1
         ++ pushq (reg rax)
         ++ auxmain exp2
-	++ movq (imm 0) (reg rdx)
+	++ movq (imm 1) (reg rdx)
 	++ movq (reg rax) (reg rsi)
         ++ popq (rax)
         ++ idivq (reg rsi)
