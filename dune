@@ -1,6 +1,0 @@
-(library
- (name compilation)
- (wrapped false))
-
-(ocamlyacc parser)
-(ocamllex lexer)
