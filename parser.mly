@@ -12,8 +12,8 @@ main:
     expr EOL                { $1 }
 ;
 expr:
-    INT                              {Asyntax.Varint($1)}
-    | LPAREN expr RPAREN             {$2 }
+    INT                              {Asyntax.Varint($1)}                         
+    | LPAREN expr RPAREN             {$2}
     | FLOAT                          {Asyntax.Varfloat($1)}
     | expr PLUSINT expr              {Asyntax.Plusint($1,$3)}
     | expr PLUSFLOAT expr            {Asyntax.Plusflot($1,$3)}
@@ -27,5 +27,8 @@ expr:
     | PLUSINT LPAREN expr RPAREN     {Asyntax.Plusi($3)}
     | PLUSFLOAT LPAREN expr RPAREN   {Asyntax.Plusf($3)}
     | expr MOD expr                  {Asyntax.Mod($1,$3)}
-;   | E expr                         {Asyntax.Ent($2)}
+    | E expr                         {Asyntax.Ent($2)}
     | F expr                         {Asyntax.Flot($2)}
+    | MINUSINT INT                   {Asyntax.Moinsi(Asyntax.Varint($2))}
+    | MINUSINT FLOAT                 {Asyntax.Moinsf(Asyntax.Varfloat($2))}
+    ;
