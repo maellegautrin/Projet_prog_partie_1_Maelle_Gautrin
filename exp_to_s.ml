@@ -18,99 +18,10 @@ type expr =
   | Plusflot of expr * expr
   | Multflot of expr * expr
   | Sousflot of expr * expr
+
 let test= Mod(Varint(4),Varint(2));;
-(*int*)
-let aff_int () =
-  let code =
-    {
-      text =
-        globl "main" ++ label "main"
-        ++ movq (imm 12) (reg rdi)
-        ++ call "print_int" ++ ret
-        ++ inline
-             "\n\
-             \    print_int:\n\
-             \        movq %rdi, %rsi\n\
-             \        movq $S_int,%rdi\n\
-             \        xorq %rax, %rax\n\
-             \        call printf\n\
-             \        ret\n\
-             \        ";
-      data = label "S_int" ++ string "%d";
-    }
-  in
-  let c = open_out "print12.s" in
-  let fmt = formatter_of_out_channel c in
-  X86_64.print_program fmt code;
-  close_out c
 
-(*addition int*)
-let add_int () =
-  let code =
-    {
-      text =
-        globl "main" ++ label "main"
-        ++ movq (imm 12) (reg rdi)
-        ++ movq (imm 56) (reg rsi)
-        ++ addq (reg rsi) (reg rdi)
-        ++ movq (reg rdi) (reg rax)
-        ++ call "print_int" ++ ret
-        ++ inline
-             "\n\
-             \    print_int:\n\
-             \        movq %rdi, %rsi\n\
-             \        movq $S_int,%rdi\n\
-             \        xorq %rax, %rax\n\
-             \        call printf\n\
-             \        ret\n\
-             \        ";
-      data = label "S_int" ++ string "%d";
-    }
-  in
-  let c = open_out "print12.s" in
-  let fmt = formatter_of_out_channel c in
-  X86_64.print_program fmt code;
-  close_out c
-
-(*soustraction int*)
-
-(*addition float*)
-(*
-let add_float()=
-    let code= {text=
-        globl "main" ++ label "main" ++
-        movsd (val1) (reg xmm0) ++
-        addsd (val2) (reg xmm0) ++
-        call "print_double" ++
-        ret ++
-        label "print_double" ++
-        mov (immm message) (reg rdi)
-        mov (imm 1) (reg rax)
-        call "printf" ++
-        ret ++
-    inline "
-        .data
-
-    val1 : .double 0.2
-    val2 : .double 0.22"} in
-    let c= open_out "print12.s" in
-    let fmt = formatter_of_out_channel c in
-    X86_64.print_program fmt code;
-    close_out c
-*)
-
-(*le*t exp_to_s expr=
-  let code= {text=
-               globl "main" ++ label "main" ++
-               (auxmain expr);
-             data=
-               label (auxdata expr);} in
-  let c= open_out "print_exp.s" in
-  let fmt = formatter_of_out_channel c in
-  X86_64.print_program fmt code;
-  close_out c;;*)
-
-let fin =
+let fin =                   	(*partie du code toujours présente: affichage int et float*)
   inline
     "\n\
     \        print_int:\n\
@@ -130,9 +41,8 @@ let fin =
 
 let exp_main expr =
   let i = ref 0 in
-  let l = ref nop in
-  let rec auxmain expr =
-    match expr with
+  let l = ref nop in     		(*liste qui sert à stocker tous les éléments à ajouter au .data à la fin *)
+  let rec auxmain expr = match expr with
     | Plusint (exp1, exp2) ->
         auxmain exp1
         ++ pushq (reg rax)
@@ -151,9 +61,8 @@ let exp_main expr =
     | Varint a -> movq (imm a) (reg rax)
     | Plusi exp1 -> auxmain exp1
     | Moinsi exp1 -> auxmain exp1 ++ subq (imm 0) (reg rax)
-    | Varfloat a ->  l:=  !l ++ inline ("val"^string_of_int !i ^ " : .double" ^string_of_float a);
+    | Varfloat a ->  l:=  !l ++ inline ("val"^string_of_int !i ^ " : .double" ^string_of_float a);  (* on définit la valeur de val i dans le .data *)
 	inline("movsd (val"^string_of_int(!i)^"), %xmm0");
-	
     | Plusflot (exp1, exp2) ->
       let ofs = (-8)*(!i) in
       let a = movsd (reg xmm0) (ind ~ofs rbp) in
@@ -204,10 +113,10 @@ let exp_main expr =
         ++ popq (rax) 
         ++ idivq (reg rsi)
         ++ movq (reg rdx) (reg rax)
-    | _ -> failwith "todo"
+    | _ -> failwith "todo"              
   in
 
-  let est_int expr = match expr with
+  let est_int expr = match expr with   (* on regarde le type de l'epression finale à afficher *)
   | Plusflot _ -> false
   | Sousflot _ -> false
   | Multflot _ -> false
@@ -219,13 +128,13 @@ let exp_main expr =
     {
       text =
          globl "main" ++ label "main" ++ auxmain expr
-         ++ (if (est_int expr) then call " print_int" else call "print_double")
-        ++ ret ++ fin; 
-         data = label "S_int" ++ string "%d" ++
-        label "S_float" ++ string "%lf" ++ !l;
+         ++ (if (est_int expr) then call " print_int" else call "print_double")   (* si c'est un float on appelle print_double, sinon on appelle print_int *)
+        ++ ret ++ fin;                                                             (* on affiche le module de fin définit plus haut *)
+         data = label "S_int" ++ string "%d" ++					  (* on définit S_int et S_float dans le .data que l'expression soit float ou int *)
+        label "S_float" ++ string "%lf" ++ !l;                                     (* on rajoute la liste contenant les éléments du .data *)
      }
    in
-   let c = open_out "print_exp2.s" in
+   let c = open_out "en_assembleur.s" in						(* on écrit dans le fichier en_assembleur.s *)
    let fmt = formatter_of_out_channel c in
   X86_64.print_program fmt code;
    close_out c;;
