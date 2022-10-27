@@ -19,7 +19,7 @@ type expr =
   | Multflot of expr * expr
   | Sousflot of expr * expr
 
-let test= Mod(Varint(4),Varint(2));;
+let test= Multflot(Varfloat(4.),Varfloat(2.));;
 
 let fin =                   	(*partie du code toujours présente: affichage int et float*)
   inline
@@ -40,7 +40,7 @@ let fin =                   	(*partie du code toujours présente: affichage int 
        \            ret\n"
 
 let exp_main expr =
-  let i = ref 0 in
+  let i = ref 1 in
   let l = ref nop in     		(*liste qui sert à stocker tous les éléments à ajouter au .data à la fin *)
   let rec auxmain expr = match expr with
     | Plusint (exp1, exp2) ->
@@ -61,39 +61,40 @@ let exp_main expr =
     | Varint a -> movq (imm a) (reg rax)
     | Plusi exp1 -> auxmain exp1
     | Moinsi exp1 -> auxmain exp1 ++ subq (imm 0) (reg rax)
-    | Varfloat a ->  l:=  !l ++ inline ("val"^string_of_int !i ^ " : .double" ^string_of_float a); (* on définit la valeur de val i dans le .data *)
-    			incr i;
-			inline("movsd (val"^string_of_int(!i)^"), %xmm0");
+    | Varfloat a ->  incr i;
+      			l:=  !l ++ inline ("val"^string_of_int !i ^ " : .double " ^string_of_float a^"\n"); (* on définit la valeur de val i dans le .data *)
+			inline("movsd val"^string_of_int(!i)^"(%rip), %xmm0");
     | Plusflot (exp1, exp2) ->
     		let ofs = (-8)*(!i) in
-    		let a = movsd (reg xmm0) (ind ~ofs rbp) in
-     		let ofs = (-8)*(!i +1) in
-     		let b = movsd (ind ~ofs rbp) (reg xmm1) in
+    		let a = movsd (reg xmm0) (ind ~ofs rsp) in
+     		let ofs = (-8)*(!i) in
+     		let b = movsd (ind ~ofs rsp) (reg xmm1) in
       auxmain exp1
-    		 ++ inline "\n \t" ++ a
-      		 ++ auxmain exp2
-     		 ++ inline"\n \t" ++ b
-    		 ++ addsd (reg xmm1) (reg xmm0)
+    		 ++ inline "\n \t" ++ a ++ inline"\t"
+      		 ++ auxmain exp2 ++ inline"\t"
+     		 ++ inline"\n \t" ++ b ++ inline"\t"
+    		 ++ addsd (reg xmm1) (reg xmm0) ++ inline"\t"
     | Sousflot (exp1, exp2) ->
        		let ofs = (-8)*(!i) in
-       		let a = movsd (reg xmm0) (ind ~ofs rbp) in
-      		let ofs = (-8)*(!i +1) in
-      		let b = movsd (ind ~ofs rbp) (reg xmm1) in
+       		let a = movsd (reg xmm0) (ind ~ofs rsp) in
+      		let ofs = (-8)*(!i) in
+      		let b = movsd (ind ~ofs rsp) (reg xmm1) in
       		auxmain exp1
-      		++ a
-     		++ auxmain exp2
-      		++ b
-        	++ subsd (reg xmm1) (reg xmm0)
+          	++ inline "\n \t" ++ a ++ inline"\t"
+          	++ auxmain exp2 ++ inline"\t"
+         	++ inline"\n \t" ++ b ++ inline"\t"
+        	++ subsd (reg xmm0) (reg xmm1)
+         	++ movsd (reg xmm1) (reg xmm0)
     | Multflot (exp1, exp2) ->
         	let ofs = (-8)*(!i) in
-        	let a = movsd (reg xmm0) (ind ~ofs rbp) in
-        	let ofs = (-8)*(!i +1) in
-        	let b = movsd (ind ~ofs rbp) (reg xmm1) in
+        	let a = movsd (reg xmm0) (ind ~ofs rsp) in
+        	let ofs = (-8)*(!i) in
+        	let b = movsd (ind ~ofs rsp) (reg xmm1) in
      		auxmain exp1
-        	++ a
-        	++ auxmain exp2
-        	++ b
-        	++ imulsd (reg xmm1) (reg xmm0)
+         	++ inline "\n \t" ++ a ++ inline"\t"
+         	++ auxmain exp2 ++ inline"\t"
+        	++ inline"\n \t" ++ b ++ inline"\t"
+        	++ mulsd (reg xmm1) (reg xmm0)
     | Divint (exp1, exp2) ->
         	auxmain exp1
         	++ pushq (reg rax)
@@ -124,13 +125,14 @@ let exp_main expr =
   |_-> true in 
   
   let code =
+    let res_aux = auxmain expr in
     {
       text =
-         globl "main" ++ label "main" ++ auxmain expr
+         globl "main" ++ label "main" ++ res_aux
          ++ (if (est_int expr) then call " print_int" else call "print_double")   (* si c'est un float on appelle print_double, sinon on appelle print_int *)
-        ++ ret ++ fin;                                                             (* on affiche le module de fin définit plus haut *)
+         ++ ret ++ fin;                                                             (* on affiche le module de fin définit plus haut *)
          data = label "S_int" ++ string "%d" ++					  (* on définit S_int et S_float dans le .data que l'expression soit float ou int *)
-        label "S_float" ++ string "%lf" ++ !l;                                     (* on rajoute la liste contenant les éléments du .data *)
+         label "S_float" ++ string "%lf" ++ !l;                                     (* on rajoute la liste contenant les éléments du .data *)
      }
    in
    let c = open_out "en_assembleur.s" in						(* on écrit dans le fichier en_assembleur.s *)
