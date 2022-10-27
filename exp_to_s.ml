@@ -44,75 +44,73 @@ let exp_main expr =
   let l = ref nop in     		(*liste qui sert à stocker tous les éléments à ajouter au .data à la fin *)
   let rec auxmain expr = match expr with
     | Plusint (exp1, exp2) ->
-        auxmain exp1
-        ++ pushq (reg rax)
-        ++ auxmain exp2 ++ popq rcx
-        ++ addq (reg rcx) (reg rax)
+        	auxmain exp1
+       		++ pushq (reg rax)
+       		++ auxmain exp2 ++ popq rcx
+       		++ addq (reg rcx) (reg rax)
     | Sousint (exp1, exp2) ->
-        auxmain exp1
-        ++ pushq (reg rax)
-        ++ auxmain exp2 ++ popq rcx
-        ++ subq (reg rcx) (reg rax)
+       		 auxmain exp1
+        	++ pushq (reg rax)
+        	++ auxmain exp2 ++ popq rcx
+       		++ subq (reg rcx) (reg rax)
     | Multint (exp1, exp2) ->
-        auxmain exp1
-        ++ pushq (reg rax)
-        ++ auxmain exp2 ++ popq rcx
-        ++ imulq (reg rcx) (reg rax)
+        	auxmain exp1
+        	++ pushq (reg rax)
+        	++ auxmain exp2 ++ popq rcx
+        	++ imulq (reg rcx) (reg rax)
     | Varint a -> movq (imm a) (reg rax)
     | Plusi exp1 -> auxmain exp1
     | Moinsi exp1 -> auxmain exp1 ++ subq (imm 0) (reg rax)
-    | Varfloat a ->  l:=  !l ++ inline ("val"^string_of_int !i ^ " : .double" ^string_of_float a);  (* on définit la valeur de val i dans le .data *)
-	inline("movsd (val"^string_of_int(!i)^"), %xmm0");
+    | Varfloat a ->  l:=  !l ++ inline ("val"^string_of_int !i ^ " : .double" ^string_of_float a); (* on définit la valeur de val i dans le .data *)
+    			incr i;
+			inline("movsd (val"^string_of_int(!i)^"), %xmm0");
     | Plusflot (exp1, exp2) ->
-      let ofs = (-8)*(!i) in
-      let a = movsd (reg xmm0) (ind ~ofs rbp) in
-      let ofs = (-8)*(!i +1) in
-      let b = movsd (ind ~ofs rbp) (reg xmm1) in
-      incr i; incr i;
+    		let ofs = (-8)*(!i) in
+    		let a = movsd (reg xmm0) (ind ~ofs rbp) in
+     		let ofs = (-8)*(!i +1) in
+     		let b = movsd (ind ~ofs rbp) (reg xmm1) in
       auxmain exp1
-      ++ inline "\n \t" ++ a
-      ++ auxmain exp2
-      ++ inline"\n \t" ++ b
-      ++ addsd (reg xmm1) (reg xmm0)
+    		 ++ inline "\n \t" ++ a
+      		 ++ auxmain exp2
+     		 ++ inline"\n \t" ++ b
+    		 ++ addsd (reg xmm1) (reg xmm0)
     | Sousflot (exp1, exp2) ->
-        let ofs = (-8)*(!i) in
-        let a = movsd (reg xmm0) (ind ~ofs rbp) in
-        let ofs = (-8)*(!i +1) in
-        let b = movsd (ind ~ofs rbp) (reg xmm1) in
-        incr i; incr i;
-        auxmain exp1
-        ++ a
-       ++ auxmain exp2
-        ++ b
-        ++ subsd (reg xmm1) (reg xmm0)
+       		let ofs = (-8)*(!i) in
+       		let a = movsd (reg xmm0) (ind ~ofs rbp) in
+      		let ofs = (-8)*(!i +1) in
+      		let b = movsd (ind ~ofs rbp) (reg xmm1) in
+      		auxmain exp1
+      		++ a
+     		++ auxmain exp2
+      		++ b
+        	++ subsd (reg xmm1) (reg xmm0)
     | Multflot (exp1, exp2) ->
-        let ofs = (-8)*(!i) in
-        let a = movsd (reg xmm0) (ind ~ofs rbp) in
-        let ofs = (-8)*(!i +1) in
-        let b = movsd (ind ~ofs rbp) (reg xmm1) in
-        incr i; incr i;
-        auxmain exp1
-        ++ a
-        ++ auxmain exp2
-        ++ b
-        ++ imulsd (reg xmm1) (reg xmm0)
+        	let ofs = (-8)*(!i) in
+        	let a = movsd (reg xmm0) (ind ~ofs rbp) in
+        	let ofs = (-8)*(!i +1) in
+        	let b = movsd (ind ~ofs rbp) (reg xmm1) in
+     		auxmain exp1
+        	++ a
+        	++ auxmain exp2
+        	++ b
+        	++ imulsd (reg xmm1) (reg xmm0)
     | Divint (exp1, exp2) ->
-        auxmain exp1
-        ++ pushq (reg rax)
-        ++ auxmain exp2
-	++ movq (imm 1) (reg rdx)
-	++ movq (reg rax) (reg rsi)
-        ++ popq (rax)
-        ++ idivq (reg rsi)
+        	auxmain exp1
+        	++ pushq (reg rax)
+        	++ auxmain exp2
+		++ movq (imm 1) (reg rdx)
+		++ movq (reg rax) (reg rsi)
+        	++ popq (rax)
+        	++ idivq (reg rsi)
     | Mod (exp1, exp2) ->
-        auxmain exp1
-        ++ pushq (reg rax)
-        ++ auxmain exp2
-	++ movq (imm 0) (reg rdx)
-	++ movq (reg rax) (reg rsi)
-        ++ popq (rax) 
-        ++ idivq (reg rsi)
-        ++ movq (reg rdx) (reg rax)
+        	auxmain exp1
+        	++ pushq (reg rax)
+        	++ auxmain exp2
+		++ movq (imm 0) (reg rdx)
+		++ movq (reg rax) (reg rsi)
+        	++ popq (rax) 
+        	++ idivq (reg rsi)
+        	++ movq (reg rdx) (reg rax)
     | _ -> failwith "todo"              
   in
 
@@ -124,6 +122,7 @@ let exp_main expr =
   | Plusf _ -> false
   | Moinsf _ -> false 
   |_-> true in 
+  
   let code =
     {
       text =
