@@ -1,5 +1,9 @@
-all : asyntax.cmo x86_64.cmo lexer.cmo parser.cmo main.cmo
+all: rapport make1
+
+make1 : asyntax.cmo x86_64.cmo lexer.cmo parser.cmo main.cmo
 	ocamlc x86_64.cmo asyntax.cmo lexer.cmo parser.cmo main.cmo -o main
+make2: rapport.tex
+	pdflatex -shell-escape rapport.tex
 
 x86_64.cmo : x86_64.ml
 	ocamlc -c x86_64.ml
