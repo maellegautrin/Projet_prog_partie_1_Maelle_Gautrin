@@ -20,14 +20,15 @@
 \maketitle
 
 \section{Première difficultés}
-La première difficulté que j'ai rencontré était que je ne comprenais pas comment il était possible d'ouvrir un fichier .exp avec ocaml pour ensuite l'utiliser mais aussi comment il était possible d'écrire dans un fichier .s une expression obtenue de manière récursive. J'ai donc beaucoup utilisé l'exemple donné par Louis pour comprendre quels objets utiliser puis sur l'exemple de ilisp pour comprendre la structure générale.
+La première difficulté que j'ai rencontré était que je ne comprenais pas comment il était possible d'ouvrir un fichier .exp avec ocaml pour ensuite l'utiliser mais aussi comment il était possible d'écrire dans un fichier .s une expression obtenue de manière récursive. J'ai donc beaucoup utilisé l'exemple donné par Louis pour comprendre quels objets utiliser puis l'exemple de ilisp pour comprendre la structure générale.
 
 \section{Difficultés d'implémentation}
-Après m'être bien aproprié le sujet, je me suis posé la question de la séparation entre les éléments allant dans le texte et cex allant dans le .data. J'ai d'abord pensé à faire deux fonctions différentes: une qui donnait seulement les éléments à mettre dans le texte et une autre seulement ceux à mette dans le .data. Mais cela m'obligait à parcourir deux fois mon arbre syntaxique. J'ai donc choisis de faire une fonction qui donnait le texte mais qui stockait les éléments à mettre dans le .data dans une liste (variable globale).
+Après m'être bien aproprié le sujet, je me suis posé la question de la séparation entre les éléments allant dans le texte et ceux allant dans le .data. J'ai d'abord pensé à faire deux fonctions différentes: une qui donnait seulement les éléments à mettre dans le texte et une autre qui donnait ceux à mettre dans le .data. Mais cela m'obligeait à parcourir deux fois mon arbre syntaxique. J'ai donc choisis de faire une fonction qui donnait le texte mais qui stockait les éléments à mettre dans le .data dans une liste (variable globale).
 
 \section{Difficultés de finalisation}
 Après avoir codé la fonction qui traduit un arbre syntaxique en un fichier .s (on passera les difficultés rencontrées pour la gestion des flottants), puis le parser et le lexer avec ocamllex, il a fallu créer le "Makefile" ce que j'ai fait avec de l'aide car je n'avais aucune idée du fonctionnement d'un Makefile.
 
-\section{Parties non traitées}
-Je n'ai pas traité la conversion d'entiers en flottants et celle de flottants en entiers.
+\section{Parties non fonctionnelless}
+J'ai traité la conversion d'entiers en flottants et celle de flottants en entiers mais elles ne fonctionnent pas.
+Je n'ai évidement pas traité de bonus.
 \end{document}
