@@ -22,7 +22,6 @@ rule token = parse
     | "%"            { MOD }	
     | '('            { LPAREN }
     | ')'            { RPAREN }
-    | '.'	     { DOT }
     | "int"          { E }
     | "float"        { F }
     | eof            { raise Eof }
