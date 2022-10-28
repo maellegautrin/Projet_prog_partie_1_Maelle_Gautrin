@@ -108,7 +108,7 @@ let exp_main expr =
         ++ movq (imm 0) (reg rdx)
         ++ movq (reg rax) (reg rsi)
         ++ popq (rax)
-        ++ idivq (reg rsi)
+        ++ divq (reg rsi)
     | Asyntax.Mod (exp1, exp2) ->
         auxmain exp1
         ++ pushq (reg rax)
