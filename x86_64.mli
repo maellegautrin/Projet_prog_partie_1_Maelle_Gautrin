@@ -35,7 +35,7 @@ val inline: string -> [> ] asm
 
 type program = {
   text : text;
-  data : data;
+  data : data; }
 
  (** un programme est constitué d'une zone de texte et d'une zone de données *)
 
