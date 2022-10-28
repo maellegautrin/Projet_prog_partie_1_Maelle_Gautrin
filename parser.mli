@@ -8,12 +8,9 @@ type token =
   | TIMESINT
   | TIMESFLOAT
   | MOD
-  | INTFUN
-  | FLOATFUN
   | DIV
   | E
   | F
-  | DOT
   | LPAREN
   | RPAREN
   | EOL
