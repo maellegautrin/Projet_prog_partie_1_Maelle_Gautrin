@@ -193,7 +193,7 @@ let subsd a b = ins "subsd %a, %a" a () b ()
 let imulw a b = ins "imulw %a, %a" a () b ()
 let imull a b = ins "imull %a, %a" a () b ()
 let imulq a b = ins "imulq %a, %a" a () b ()
-let imulsd a b = ins "imulsd %a, %a" a () b ()
+let mulsd a b = ins "mulsd %a, %a" a () b ()
 let idivq a = ins "idivq %a" a ()
 
 let divq a = ins "divq %a" a () 
