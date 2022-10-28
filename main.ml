@@ -52,7 +52,6 @@ let exp_main expr =
         ++ pushq (reg rax)
         ++ auxmain exp2 ++ popq rcx
         ++ addq (reg rcx) (reg rax)
-        ++ 
     | Asyntax.Sousint (exp1, exp2) ->
         auxmain exp1
         ++ pushq (reg rax)
