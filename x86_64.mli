@@ -36,14 +36,6 @@ val inline: string -> [> ] asm
 type program = {
   text : text;
   data : data;
-(** {0 Bibliothèque pour l'écriture de programmes X86-64 }
-
-    Il s'agit là uniquement d'un fragment relativement petit
-    de l'assembleur X86-64.
-
-    @author Jean-Christophe Filliâtre (CNRS)
-    @author Kim Nguyen (Université Paris Sud)
-*)
 
  (** un programme est constitué d'une zone de texte et d'une zone de données *)
 
