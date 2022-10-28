@@ -1,4 +1,4 @@
-all: rapport make1
+all: make1 make2
 
 make1 : asyntax.cmo x86_64.cmo lexer.cmo parser.cmo main.cmo
 	ocamlc x86_64.cmo asyntax.cmo lexer.cmo parser.cmo main.cmo -o main
