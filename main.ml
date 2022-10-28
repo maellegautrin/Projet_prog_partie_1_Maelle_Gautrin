@@ -150,7 +150,7 @@ let exp_main expr =
       (* on rajoute la liste contenant les éléments du .data *)
     }
   in
-  let c = open_out "bob.s" in
+  let c = open_out "test.s" in
   (* on écrit dans le fichier en_assembleur.s *)
   let fmt = formatter_of_out_channel c in
   X86_64.print_program fmt code;
