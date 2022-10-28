@@ -45,36 +45,6 @@ type program = {
     @author Kim Nguyen (Université Paris Sud)
 *)
 
-(** {1 Code } *)
-
-type 'a asm
-  (** type abstrait du code assembleur.
-      Le paramètre ['a] est utilisé comme type fantôme. *)
-
-type text = [ `text ] asm
-  (** du code assembleur se trouvant dans la zone de texte *)
-
-type data = [ `data ] asm
-  (** du code assembleur se trouvant dans la zone de données *)
-
-type label = string
-  (** les étiquettes d'addresses sont des chaînes de caractères *)
-
-val nop : [> ] asm
-  (** l'instruction vide. Peut se trouver dans du text ou du data *)
-
-val ( ++ ) : ([< `text|`data ] asm as 'a)-> 'a -> 'a
-  (** concatène deux bouts de codes (soit text avec text, soit data avec
-      data) *)
-
-val inline: string -> [> ] asm
-  (** [inline s] recopie la chaîne [s] telle quelle dans le fichier
-      assembleur *)
-
-type program = {
-  text : text;
-  data : data;
-}
  (** un programme est constitué d'une zone de texte et d'une zone de données *)
 
 val print_program : Format.formatter -> program -> unit
