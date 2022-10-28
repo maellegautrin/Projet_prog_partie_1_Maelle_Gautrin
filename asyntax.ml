@@ -5,8 +5,8 @@ type expr =
   | Plusf of expr
   | Moinsi of expr
   | Moinsf of expr
-  | Ent of expr
-  | Flot of expr
+  | E of expr
+  | F of expr
   | Plusint of expr * expr
   | Multint of expr * expr
   | Sousint of expr * expr

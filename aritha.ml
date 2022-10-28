@@ -20,7 +20,9 @@ open X86_64
   | Mod of expr * expr
   | Plusflot of expr * expr
   | Multflot of expr * expr
-  | Sousflot of expr * expr *)
+  | Sousflot of expr * expr
+  | E of expr
+  | F of expr  *)
 
 let fin =
   (*partie du code toujours présente: affichage int et float*)
@@ -119,18 +121,18 @@ let exp_main expr =
         ++ popq (rax)
         ++ divq (reg rsi)
         ++ movq (reg rdx) (reg rax)
-    | _ -> failwith "todo"
+    | Asyntax.E (exp) -> auxmain exp ++ inline "\n \t cvtsd2ss %xmm0, %rax \n"
+    | Asyntax.F (exp)-> auxmain exp ++ inline "\n \t cvtss2sd %rax, %xmm0 \n"
   in
 
-  let est_int expr =
-    match expr with
-    (* on regarde le type de l'epression finale à afficher *)
+  let est_int expr = match expr with    (* on regarde le type de l'epression finale à afficher *)
     | Asyntax.Plusflot _ -> false
     | Asyntax.Sousflot _ -> false
     | Asyntax.Multflot _ -> false
     | Asyntax.Varfloat _ -> false
     | Asyntax.Plusf _ -> false
     | Asyntax.Moinsf _ -> false
+    | Asyntax.F _->false
     | _ -> true
   in
 

@@ -2,6 +2,7 @@ all: make1 make2
 
 make1 : asyntax.cmo x86_64.cmo lexer.cmo parser.cmo aritha.cmo
 	ocamlc x86_64.cmo asyntax.cmo lexer.cmo parser.cmo aritha.cmo -o aritha
+
 make2: rapport.tex
 	pdflatex -shell-escape rapport.tex
 
@@ -11,7 +12,7 @@ x86_64.cmo : x86_64.ml
 x86_64.ml :
 	ocamlc -c x86_64.mli
 
-main.cmo :
+aritha.cmo :
 	ocamlc -c aritha.ml
 
 asyntax.cmo :

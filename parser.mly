@@ -27,8 +27,8 @@ expr:
     | PLUSINT LPAREN expr RPAREN     {Asyntax.Plusi($3)}
     | PLUSFLOAT LPAREN expr RPAREN   {Asyntax.Plusf($3)}
     | expr MOD expr                  {Asyntax.Mod($1,$3)}
-    | E expr                         {Asyntax.Ent($2)}
-    | F expr                         {Asyntax.Flot($2)}
+    | E LPAREN expr RPAREN           {Asyntax.E($3)}
+    | F LPAREN expr RPAREN                         {Asyntax.F($3)}
     | MINUSINT INT                   {Asyntax.Moinsi(Asyntax.Varint($2))}
     | MINUSINT FLOAT                 {Asyntax.Moinsf(Asyntax.Varfloat($2))}
     ;
