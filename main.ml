@@ -102,12 +102,12 @@ let exp_main expr =
         ++ inline "\t" ++ inline "\n \t" ++ b ++ inline "\t"
         ++ mulsd (reg xmm1) (reg xmm0)
     | Asyntax.Divint (exp1, exp2) ->
-        auxmain exp1
+           auxmain exp1
         ++ pushq (reg rax)
         ++ auxmain exp2
-        ++ movq (imm 1) (reg rdx)
+        ++ movq (imm 0) (reg rdx)
         ++ movq (reg rax) (reg rsi)
-        ++ popq rax
+        ++ popq (rax)
         ++ idivq (reg rsi)
     | Asyntax.Mod (exp1, exp2) ->
         auxmain exp1
@@ -115,7 +115,7 @@ let exp_main expr =
         ++ auxmain exp2
         ++ movq (imm 0) (reg rdx)
         ++ movq (reg rax) (reg rsi)
-        ++ popq rax
+        ++ popq (rax)
         ++ idivq (reg rsi)
         ++ movq (reg rdx) (reg rax)
     | _ -> failwith "todo"
