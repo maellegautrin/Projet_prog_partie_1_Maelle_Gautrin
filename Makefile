@@ -9,9 +9,6 @@ make2: rapport.tex
 x86_64.cmo : x86_64.ml
 	ocamlc -c x86_64.ml
 
-x86_64.ml :
-	ocamlc -c x86_64.mli
-
 aritha.cmo :
 	ocamlc -c aritha.ml
 
