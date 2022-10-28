@@ -116,7 +116,7 @@ let exp_main expr =
         ++ movq (imm 0) (reg rdx)
         ++ movq (reg rax) (reg rsi)
         ++ popq (rax)
-        ++ idivq (reg rsi)
+        ++ divq (reg rsi)
         ++ movq (reg rdx) (reg rax)
     | _ -> failwith "todo"
   in
