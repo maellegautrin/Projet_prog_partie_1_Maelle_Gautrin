@@ -1,8 +1,8 @@
 open Format
 open Asyntax
+open X86_64
 open Lexer
 open Parser
-open X86_64
 
 (* type expr =
   | Varint of int
