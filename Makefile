@@ -34,7 +34,7 @@ lexer.ml :
 	ocamllex lexer.mll
 
 clean :
-	rm -f asyntax.cmi asyntax.cmo lexer.cmo lexer.cmi lexer.ml parser.cmi parser.cmo parser.ml parser.mli aritha aritha.cmi aritha.cmo rapport.log rapport.out rapport.pdf x86_64.cmi X86_64.cmo 
+	rm -f asyntax.cmi asyntax.cmo lexer.cmo lexer.cmi lexer.ml parser.cmi parser.cmo parser.ml parser.mli aritha aritha.cmi aritha.cmo rapport.log rapport.out rapport.pdf X86_64.cmo 
 
 
 
